@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pizza Pursuit - Live Demo Showcase</title>
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" href="{{ url_for('static', filename='images/pizzalogo.png') }}" type="image/png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pico-main/css/pico.min.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #059669;
+            scroll-behavior: smooth;
+        }
+        body, h1, h2, h3, p, button, a, nav {
+            text-transform: lowercase;
+            font-family: 'Space Mono', monospace;
+        }
+        #outerContainer {
+            display: flex;
+            height: calc(100vh - 60px);
+            background-color: rgba(5, 150, 105, 0.1);
+            border: 4px solid #000;
+        }
+        #leftContainer {
+            flex: 6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(5, 150, 105, 0.1);
+            position: relative;
+        }
+        #rightContainer {
+            flex: 4;
+            display: flex;
+            flex-direction: column;
+        }
+        #videoContainer {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid #000;
+            background-color: #000;
+            overflow: hidden;
+            position: relative;
+        }
+        #videoFeed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #bottomRight {
+            flex: 1;
+            padding: 16px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            border: 4px solid #000;
+            background-color: rgba(5, 150, 105, 0.1);
+            gap: 8px;
+        }
+        #exerciseImage {
+            max-width: 80%;
+            max-height: 420px;
+            image-rendering: pixelated;
+            transition: transform 0.2s ease;
+        }
+        #progressContainer {
+            width: 100%;
+            background-color: #ddd;
+            margin-top: 10px;
+            height: 28px;
+            border: 2px solid #000;
+            overflow: hidden;
+        }
+        #progressBar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary);
+            text-align: center;
+            line-height: 28px;
+            color: white;
+            font-family: 'Space Mono', monospace;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: width 0.3s ease;
+        }
+        #nextLevelButton {
+            display: none;
+            background-color: var(--primary);
+            border: 3px solid #000;
+            font-family: 'Press Start 2P', cursive;
+            color: white;
+            padding: 10px 16px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: rgba(5, 150, 105, 0.1);
+            border: 4px solid #000;
+        }
+        nav .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        nav .navbar-left img {
+            height: 38px;
+        }
+        .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+        }
+        #instructionsBox {
+            font-family: 'Space Mono', monospace;
+            color: #222;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 6px;
+            border: 2px solid #000;
+            background: rgba(255,255,255,0.7);
+            width: 100%;
+        }
+        #counterDisplay {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.8rem;
+            color: #111;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        .live-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #059669;
+            color: #10b981;
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            font-family: 'Space Mono', monospace;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 10;
+        }
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: blink 1s infinite alternate;
+        }
+        @keyframes blink { from { opacity: 0.3; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="navbar-left">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+            <span class="pixel-font">MOVE AI</span>
+            <span style="font-size: 0.75rem; background: #059669; color: white; padding: 2px 6px; border: 1px solid #000;">DEMO SHOWCASE</span>
+        </div>
+        <div class="navbar-right">
+            <a href="/pizzagame" class="pixel-font" style="color: var(--primary); text-decoration: none; margin-left: 1rem;">games</a>
+            <a href="/demo_movement" class="pixel-font" style="color: var(--primary); text-decoration: none; margin-left: 1rem;">angle demo</a>
+            <a href="http://localhost:5173" class="pixel-font" style="color: var(--primary); text-decoration: none; margin-left: 1rem;">landing page</a>
+        </div>
+    </nav>
+
+    <div id="outerContainer">
+        <div id="leftContainer">
+            <div class="live-badge">
+                <span class="pulse-dot"></span>
+                <span>PIZZA PURSUIT: LEVEL 1</span>
+            </div>
+            <img id="exerciseImage" src="{{ url_for('static', filename='images/knead0.png') }}" alt="Exercise Step">
+            <div style="margin-top: 12px; font-size: 0.8rem; font-weight: bold; color: #047857;" id="stageText">
+                Dough Transformation Stage 1 of 6
+            </div>
+        </div>
+
+        <div id="rightContainer">
+            <div id="videoContainer">
+                <div class="live-badge">
+                    <span class="pulse-dot"></span>
+                    <span>CV MOTION FEED (ACTIVE)</span>
+                </div>
+                <video id="videoFeed" src="{{ url_for('static', filename='videos/pizza-demo.mp4') }}" autoplay loop muted playsinline></video>
+            </div>
+
+            <div id="bottomRight">
+                <div id="instructionsBox">
+                    <p style="margin: 0;">follow the on-screen instructions and watch your video feedback. complete the exercise to advance.</p>
+                </div>
+                <div id="instructionsBox" style="background: rgba(5,150,105,0.15); border-color: #059669;">
+                    <p style="margin: 0; font-weight: bold;">let's start by kneading the dough! use a resistance band and pull your elbows apart, hold for 3 seconds, then bring them back together.</p>
+                </div>
+
+                <div style="width: 100%; text-align: center;">
+                    <button onclick="toggleAudioGuide()" id="audioBtn" style="background-color: #059669; border: 2px solid #000; font-family: 'Space Mono', monospace; font-size: 0.8rem; padding: 6px 12px; cursor: pointer; color: white; width: 100%;">
+                        🔊 استمع للتوجيهات الصوتية (سيلما AI)
+                    </button>
+                    <audio id="levelAudio" src="{{ url_for('static', filename='audio/knead.wav') }}" preload="auto"></audio>
+                </div>
+
+                <div id="progressContainer">
+                    <div id="progressBar">0 / 10</div>
+                </div>
+
+                <button id="nextLevelButton" onclick="window.location.href='/tosspizza'">Stage Complete! Next Level &rarr;</button>
+
+                <div id="counterDisplay">Counter: 0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var baseUrl = "{{ url_for('static', filename='images/knead') }}";
+        var video = document.getElementById('videoFeed');
+        var counter = 0;
+        var maxReps = 10;
+        var repInterval = 3.2;
+
+        video.addEventListener('timeupdate', function() {
+            var time = video.currentTime;
+            var currentRep = Math.min(Math.floor(time / repInterval), maxReps);
+            if (currentRep !== counter && currentRep > 0) {
+                counter = currentRep;
+                updateUI();
+            }
+        });
+
+        function updateUI() {
+            var imgElement = document.getElementById('exerciseImage');
+            var progressBar = document.getElementById('progressBar');
+            var nextLevelButton = document.getElementById('nextLevelButton');
+            var counterDisplay = document.getElementById('counterDisplay');
+            var stageText = document.getElementById('stageText');
+
+            counterDisplay.innerText = "Counter: " + counter;
+
+            var imgIdx = Math.min(Math.floor(counter / 2), 5);
+            imgElement.src = baseUrl + imgIdx + '.png';
+            stageText.innerText = "Dough Transformation Stage " + (imgIdx + 1) + " of 6";
+
+            if (counter >= maxReps) {
+                nextLevelButton.style.display = 'block';
+            } else {
+                nextLevelButton.style.display = 'none';
+            }
+
+            var progressPct = Math.min((counter / maxReps) * 100, 100);
+            progressBar.style.width = progressPct + '%';
+            progressBar.innerText = counter + ' / ' + maxReps;
+        }
+
+        function toggleAudioGuide() {
+            var audio = document.getElementById('levelAudio');
+            var btn = document.getElementById('audioBtn');
+            if (audio.paused) {
+                audio.currentTime = 0;
+                audio.play();
+                btn.innerText = "⏸️ إيقاف الصوت (Stop Audio)";
+                btn.style.backgroundColor = "#d97706";
+            } else {
+                audio.pause();
+                btn.innerText = "🔊 استمع للتوجيهات الصوتية (سيلما AI)";
+                btn.style.backgroundColor = "#059669";
+            }
+        }
+    </script>
+</body>
+</html>

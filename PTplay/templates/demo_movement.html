@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MOVE AI - Clinical Angle Demo Showcase</title>
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pico-main/css/pico.min.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #059669;
+        }
+        body, h1, h2, h3, p, button, a, nav {
+            font-family: 'Space Mono', monospace;
+        }
+        #container {
+            display: flex;
+            height: calc(100vh - 65px);
+            border: 4px solid #000;
+        }
+        #leftSide {
+            flex: 6;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-right: 4px solid #000;
+            overflow: hidden;
+        }
+        #rightSide {
+            flex: 4;
+            background-color: rgba(5, 150, 105, 0.08);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        #videoFeed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: rgba(5, 150, 105, 0.1);
+            border: 4px solid #000;
+        }
+        .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.85);
+            border: 2px solid #000;
+            padding: 14px;
+            box-shadow: 2px 2px 0px #000;
+        }
+        .live-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(0,0,0,0.85);
+            border: 2px solid #059669;
+            color: #10b981;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: blink 1s infinite alternate;
+        }
+        @keyframes blink { from { opacity: 0.3; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <nav>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" style="height: 38px;">
+            <span class="pixel-font">MOVE AI</span>
+            <span style="font-size: 0.75rem; background: #059669; color: white; padding: 2px 6px; border: 1px solid #000;">CLINICAL ANGLE DEMO</span>
+        </div>
+        <div>
+            <a href="/demo_pizza" class="pixel-font" style="color: var(--primary); text-decoration: none; margin-left: 1rem;">pizza demo</a>
+            <a href="/pizzagame" class="pixel-font" style="color: var(--primary); text-decoration: none; margin-left: 1rem;">games</a>
+            <a href="http://localhost:5173" class="pixel-font" style="color: var(--primary); text-decoration: none; margin-left: 1rem;">landing page</a>
+        </div>
+    </nav>
+
+    <div id="container">
+        <div id="leftSide">
+            <div class="live-badge">
+                <span class="pulse-dot"></span>
+                <span>INTELLIREHABDS GONIOMETRY ANALYSIS</span>
+            </div>
+            <video id="videoFeed" src="{{ url_for('static', filename='videos/movement-demo.mp4') }}" autoplay loop muted playsinline></video>
+        </div>
+
+        <div id="rightSide">
+            <div class="stat-card">
+                <div style="font-size: 0.75rem; color: #555; text-transform: uppercase;">Exercise</div>
+                <h3 style="margin: 4px 0 0 0; color: #047857;">Left Bicep Curl & Elbow AROM</h3>
+            </div>
+
+            <div class="stat-card" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 0.75rem; color: #555;">CURRENT ANGLE</div>
+                    <div id="angleDisplay" style="font-size: 2.2rem; font-weight: bold; color: #111;">160°</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.75rem; color: #555;">TARGET ROM</div>
+                    <div style="font-size: 1.2rem; font-weight: bold; color: #059669;">35° - 165°</div>
+                </div>
+            </div>
+
+            <div class="stat-card" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 0.75rem; color: #555;">REPS COMPLETED</div>
+                    <div id="repsDisplay" style="font-size: 2.2rem; font-weight: bold; color: #111;">0</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.75rem; color: #555;">STAGE</div>
+                    <div id="stageDisplay" style="font-size: 1.2rem; font-weight: bold; color: #059669;">REST</div>
+                </div>
+            </div>
+
+            <div class="stat-card" style="background: rgba(5,150,105,0.15); border-color: #059669;">
+                <div style="font-size: 0.75rem; color: #047857; font-weight: bold;">SAUDI ATTIRE OCCLUSION ENGINE</div>
+                <div style="font-size: 0.85rem; margin-top: 4px;">Active loose fabric compensation: <strong>88% Confidence</strong></div>
+            </div>
+
+            <button onclick="toggleAudioGuide()" id="audioBtn" style="background-color: #059669; border: 3px solid #000; font-family: 'Space Mono', monospace; font-size: 0.9rem; padding: 10px; cursor: pointer; color: white; width: 100%;">
+                🔊 استمع للتوجيه الصوتي (سيلما AI)
+            </button>
+            <audio id="audioCoach" src="{{ url_for('static', filename='audio/cheese.wav') }}" preload="auto"></audio>
+        </div>
+    </div>
+
+    <script>
+        var video = document.getElementById('videoFeed');
+        var angleDisplay = document.getElementById('angleDisplay');
+        var repsDisplay = document.getElementById('repsDisplay');
+        var stageDisplay = document.getElementById('stageDisplay');
+
+        var repInterval = 3.8;
+
+        video.addEventListener('timeupdate', function() {
+            var time = video.currentTime;
+            var cycle = (time % repInterval) / repInterval;
+            var ang = Math.round(100 + 65 * Math.cos(cycle * 2 * Math.PI));
+            angleDisplay.innerText = ang + "°";
+
+            var reps = Math.floor(time / repInterval);
+            repsDisplay.innerText = reps;
+
+            if (cycle < 0.25) {
+                stageDisplay.innerText = "EXTENDED";
+                stageDisplay.style.color = "#4b5563";
+            } else if (cycle < 0.5) {
+                stageDisplay.innerText = "FLEXING UP";
+                stageDisplay.style.color = "#059669";
+            } else if (cycle < 0.75) {
+                stageDisplay.innerText = "PEAK FLEXION";
+                stageDisplay.style.color = "#d97706";
+            } else {
+                stageDisplay.innerText = "LOWERING";
+                stageDisplay.style.color = "#2563eb";
+            }
+        });
+
+        function toggleAudioGuide() {
+            var audio = document.getElementById('audioCoach');
+            var btn = document.getElementById('audioBtn');
+            if (audio.paused) {
+                audio.currentTime = 0;
+                audio.play();
+                btn.innerText = "⏸️ إيقاف الصوت (Stop Audio)";
+                btn.style.backgroundColor = "#d97706";
+            } else {
+                audio.pause();
+                btn.innerText = "🔊 استمع للتوجيه الصوتي (سيلما AI)";
+                btn.style.backgroundColor = "#059669";
+            }
+        }
+    </script>
+</body>
+</html>
