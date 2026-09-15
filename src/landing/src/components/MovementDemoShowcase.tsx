@@ -40,10 +40,12 @@ export const MovementDemoShowcase: React.FC<MovementDemoShowcaseProps> = ({ lang
     compensating: true
   });
 
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
+  const [formFeedback, setFormFeedback] = useState<string>('Ready - Good Starting Posture');
+  const [speedFeedback, setSpeedFeedback] = useState<'Good Form!' | 'Speed Up!' | 'Slow Down!' | 'Get Ready'>('Get Ready');
+
   const poseDetectorRef = useRef<PoseDetector | null>(null);
   const trackerRef = useRef<ExerciseTracker>(new ExerciseTracker('bicep_curl_left'));
-
-  const REP_INTERVAL = 3.8;
 
   useEffect(() => {
     trackerRef.current = new ExerciseTracker('bicep_curl_left');
@@ -70,26 +72,93 @@ export const MovementDemoShowcase: React.FC<MovementDemoShowcaseProps> = ({ lang
     const progress = (currentTime / video.duration) * 100;
     setVideoProgress(progress);
 
-    // Calculate angle oscillation: from ~165° (extended) down to ~35° (flexed)
-    const cycleTime = currentTime % REP_INTERVAL;
-    const norm = cycleTime / REP_INTERVAL;
-    const ang = 100 + 65 * Math.cos(norm * 2 * Math.PI);
-    setCurrentAngle(Math.round(ang));
+    // Precise clinical trajectory synchronized with the 14.29s trimmed & slowed video
+    const t = currentTime % 14.29;
 
-    if (norm < 0.25) {
-      setStage('rest');
-    } else if (norm < 0.5) {
-      setStage('up');
-    } else if (norm < 0.75) {
-      setStage('down');
+    let computedAngle = 170;
+    let computedStage: 'ready' | 'up' | 'down' | 'rest' = 'ready';
+    let computedReps = 0;
+    let feedbackForm = 'Ready - Good Starting Posture';
+    let feedbackSpeed: 'Good Form!' | 'Speed Up!' | 'Slow Down!' | 'Get Ready' = 'Get Ready';
+
+    if (t < 4.2) {
+      // 0.0s - 4.2s: Ready Stance, arm extended at ~168-175°
+      const p = t / 4.2;
+      computedAngle = Math.round(168 + 7 * Math.sin(p * Math.PI));
+      computedStage = 'ready';
+      computedReps = 0;
+      feedbackForm = 'Ready - Good Starting Posture';
+      feedbackSpeed = 'Get Ready';
+    } else if (t < 6.4) {
+      // 4.2s - 6.4s: Rep 1 Concentric Flexion (curl UP from 172° to 24°)
+      const p = (t - 4.2) / 2.2;
+      const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
+      computedAngle = Math.round(172 - 148 * ease);
+      computedStage = 'up';
+      computedReps = 0;
+      feedbackForm = computedAngle < 50 ? 'Full Flexion Achieved' : 'Keep Elbow Pinned';
+      feedbackSpeed = 'Good Form!';
+    } else if (t < 7.0) {
+      // 6.4s - 7.0s: Peak Flexion Hold at 24°
+      computedAngle = 24;
+      computedStage = 'up';
+      computedReps = 0;
+      feedbackForm = 'Peak Flexion Hold (ROM 100%)';
+      feedbackSpeed = 'Good Form!';
+    } else if (t < 8.6) {
+      // 7.0s - 8.6s: Rep 1 Eccentric Extension (lowering DOWN from 24° to 168°)
+      const p = (t - 7.0) / 1.6;
+      const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
+      computedAngle = Math.round(24 + 144 * ease);
+      computedStage = 'down';
+      computedReps = 0;
+      feedbackForm = 'Smooth Eccentric Lowering';
+      feedbackSpeed = 'Good Form!';
+    } else if (t < 10.4) {
+      // 8.6s - 10.4s: Rep 1 Completed, brief pause at 168-174°
+      computedAngle = Math.round(168 + 6 * Math.sin((t - 8.6) * Math.PI));
+      computedStage = 'rest';
+      computedReps = 1;
+      feedbackForm = 'Rep 1 Completed! Brief Pause';
+      feedbackSpeed = 'Get Ready';
+    } else if (t < 12.4) {
+      // 10.4s - 12.4s: Rep 2 Concentric Flexion (curl UP from 174° to 24°)
+      const p = (t - 10.4) / 2.0;
+      const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
+      computedAngle = Math.round(174 - 150 * ease);
+      computedStage = 'up';
+      computedReps = 1;
+      feedbackForm = computedAngle < 50 ? 'Full Flexion Achieved' : 'Maintain Shoulder Form';
+      feedbackSpeed = 'Good Form!';
+    } else if (t < 12.8) {
+      // 12.4s - 12.8s: Rep 2 Peak Flexion Hold at 24°
+      computedAngle = 24;
+      computedStage = 'up';
+      computedReps = 1;
+      feedbackForm = 'Peak Flexion Hold (ROM 100%)';
+      feedbackSpeed = 'Good Form!';
     } else {
-      setStage('ready');
+      // 12.8s - 14.29s: Rep 2 Eccentric Extension (lowering to 165°)
+      const p = Math.min((t - 12.8) / 1.4, 1.0);
+      const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
+      computedAngle = Math.round(24 + 141 * ease);
+      const isDone = p > 0.8;
+      computedStage = isDone ? 'ready' : 'down';
+      computedReps = isDone ? 2 : 1;
+      feedbackForm = isDone ? 'Rep 2 Completed!' : 'Controlled Descent';
+      feedbackSpeed = isDone ? 'Good Form!' : 'Good Form!';
     }
 
-    const computedReps = Math.floor(currentTime / REP_INTERVAL);
-    if (computedReps !== reps && computedReps > 0) {
+    setCurrentAngle(computedAngle);
+    setStage(computedStage);
+    setFormFeedback(feedbackForm);
+    setSpeedFeedback(feedbackSpeed);
+
+    if (computedReps !== reps) {
       setReps(computedReps);
-      soundFX.playRepChime();
+      if (computedReps > 0) {
+        soundFX.playRepChime();
+      }
     }
   }, [reps]);
 
@@ -98,11 +167,19 @@ export const MovementDemoShowcase: React.FC<MovementDemoShowcaseProps> = ({ lang
     if (video) {
       video.src = '/videos/movement-demo.mp4';
       video.loop = true;
+      video.playbackRate = playbackSpeed;
       video.ontimeupdate = handleTimeUpdate;
       video.play().catch(e => console.log('Auto-play prevented:', e));
       poseDetectorRef.current?.setVideoSource(video, false, 'bicep_curl_left');
     }
-  }, [handleTimeUpdate]);
+  }, [handleTimeUpdate, playbackSpeed]);
+
+  const handleSpeedChange = (speed: number) => {
+    setPlaybackSpeed(speed);
+    if (videoRef.current) {
+      videoRef.current.playbackRate = speed;
+    }
+  };
 
   const togglePlay = () => {
     const video = videoRef.current;
@@ -124,7 +201,7 @@ export const MovementDemoShowcase: React.FC<MovementDemoShowcaseProps> = ({ lang
       setIsPlaying(true);
     }
     setReps(0);
-    setStage('rest');
+    setStage('ready');
   };
 
   const toggleAudioCoach = () => {
@@ -151,11 +228,11 @@ export const MovementDemoShowcase: React.FC<MovementDemoShowcaseProps> = ({ lang
     currentAngle,
     targetAngle: 45,
     romPercentage: Math.min(Math.round(((165 - currentAngle) / (165 - 35)) * 100), 100),
-    tempoScore: 92,
-    formFeedback: currentAngle < 50 ? 'Full Flexion Achieved' : 'Keep Elbow Pinned',
-    speedFeedback: 'Good Form!',
+    tempoScore: 94,
+    formFeedback,
+    speedFeedback,
     isGoodForm: true,
-    timeInRep: 1.8
+    timeInRep: 2.1
   };
 
   return (
@@ -201,6 +278,28 @@ export const MovementDemoShowcase: React.FC<MovementDemoShowcaseProps> = ({ lang
             {isPlayingAudio ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
             <span>{isAr ? 'التوجيه الصوتي (سيلما AI)' : 'Voice Coach (Silma AI)'}</span>
           </button>
+
+          {/* Speed Selector */}
+          <div className="flex items-center bg-neutral-800/90 rounded-xl p-1 border border-neutral-700 text-xs font-mono">
+            {[
+              { label: '0.5x', value: 0.5 },
+              { label: '0.75x', value: 0.75 },
+              { label: '1.0x', value: 1.0 },
+            ].map(s => (
+              <button
+                key={s.value}
+                onClick={() => handleSpeedChange(s.value)}
+                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                  playbackSpeed === s.value
+                    ? 'bg-emerald-600 text-white font-bold shadow-sm'
+                    : 'text-neutral-400 hover:text-white'
+                }`}
+                title={`Playback Speed ${s.label}`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
 
           <button
             onClick={togglePlay}
