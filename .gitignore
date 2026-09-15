@@ -20,6 +20,9 @@ dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+# Legacy Assets
+imagesOld/
+imagesOld2/
 
 # Python / Backend
 __pycache__/
@@ -54,17 +57,18 @@ Untitled.ipynb
 ~$*.pptx
 *.pdf
 *.docx
-keyframes/
-scratch/
-.icon_cache/
-.claude/
-moveai-qr/
+/keyframes/
+/scratch/
+/.icon_cache/
+/.claude/
+/moveai-qr/
 recovery_audio.mp3
 recovery_audio.wav
 RecoveryLab Demo Treehacks 20261080p.mp4
 poster_output.png
-SystemDesignSignature/
-assets/
-Videos/
-context/
-src/scripts/
+/SystemDesignSignature/
+/assets/
+/Videos/
+/context/
+/src/scripts/
+
