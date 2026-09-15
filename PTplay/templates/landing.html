@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MOVE — AI Physical Therapy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pico-main/css/pico.min.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #059669;
+            --primary-hover: #047857;
+            --accent: #d97706;
+            scroll-behavior: smooth;
+        }
+
+        body, h1, h2, h3, p, button, a, nav {
+            font-family: 'Space Mono', monospace;
+        }
+
+        .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: rgba(5, 150, 105, 0.12);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        nav .navbar-left .logo-badge {
+            background: #059669;
+            color: white;
+            padding: 6px 12px;
+            font-weight: 900;
+            font-size: 1.2rem;
+            border: 2px solid #000;
+        }
+
+        nav .navbar-right a {
+            margin-left: 1.2rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav .navbar-right a:hover {
+            text-decoration: underline;
+        }
+
+        .hero-banner {
+            padding: 4rem 1rem 2rem 1rem;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+            color: #059669;
+            margin-bottom: 1rem;
+        }
+
+        .hero-sub {
+            font-size: 1.1rem;
+            color: #4b5563;
+            max-width: 700px;
+            margin: 0 auto 2rem auto;
+        }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .info-box {
+            padding: 1.8rem;
+            border: 3px solid #000;
+            background-color: rgba(5, 150, 105, 0.08);
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        .info-box h3 {
+            color: #059669;
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        button, a.button {
+            background-color: var(--primary);
+            border: 3px solid #000;
+            border-radius: 0;
+            font-family: 'Press Start 2P', cursive;
+            color: white;
+            padding: 0.9rem 1.6rem;
+            display: inline-block;
+            text-decoration: none;
+            box-shadow: 4px 4px 0px #000;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover, a.button:hover {
+            background-color: var(--primary-hover);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000;
+        }
+
+        .pixel-border {
+            border: 4px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <nav class="pixel-border">
+        <div className="navbar-left">
+            <span class="logo-badge pixel-font">MOVE</span>
+            <span class="pixel-font">AI Rehab</span>
+        </div>
+        <div class="navbar-right">
+            <a href="/practicestudio" class="pixel-font">practice studio</a>
+            <a href="/pizzagame" class="pixel-font">mini-games</a>
+            <a href="/data" class="pixel-font">kinematics</a>
+            <a href="/design" class="pixel-font">architecture</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="hero-banner">
+            <h1 class="hero-title pixel-font">MOVE AI</h1>
+            <p class="hero-sub">
+                Culturally-adapted computer vision rehabilitation for Saudi patients. Markerless pose tracking, loose attire occlusion tolerance, and clinical trajectory biofeedback.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <a href="/practicestudio" class="button">Practice Studio</a>
+                <a href="/pizzagame" class="button" style="background-color: #d97706;">Play Mini-Games</a>
+            </div>
+        </section>
+
+        <section class="grid-cards">
+            <div class="info-box">
+                <h3 class="pixel-font">Clinical Trajectories</h3>
+                <p>Real-time biomechanical analysis comparing live patient joint angles against 2,589 IntelliRehabDS clinical gold-standard curves.</p>
+                <a href="/practicestudio" class="button" style="font-size: 0.7rem; padding: 0.6rem 1rem;">Launch Studio</a>
+            </div>
+
+            <div class="info-box">
+                <h3 class="pixel-font">Attire Robustness</h3>
+                <p>Engineered for traditional Saudi attire (thobe, abaya). Dynamic kinematic compensation prevents false rep tracking under loose fabric.</p>
+                <a href="/data" class="button" style="font-size: 0.7rem; padding: 0.6rem 1rem;">View Data</a>
+            </div>
+
+            <div class="info-box">
+                <h3 class="pixel-font">Gamified Coaching</h3>
+                <p>Transforms repetitive physical therapy exercises into micro-sessions with real-time audio coaching and tempo biofeedback.</p>
+                <a href="/pizzagame" class="button" style="font-size: 0.7rem; padding: 0.6rem 1rem;">Start Game</a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

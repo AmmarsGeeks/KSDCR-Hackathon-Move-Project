@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MOVE — Left Arm Curl</title>
+    <meta name="color-scheme" content="light dark">
+
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pico-main/css/pico.min.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #059669;
+            --primary-hover: #047857;
+        }
+
+        #outerContainer {
+            display: flex;
+            height: calc(100vh - 75px);
+            background-color: rgba(5, 150, 105, 0.05);
+            border: 4px solid #000;
+        }
+
+        #videoContainer {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #090d16;
+            padding: 20px;
+        }
+
+        #videoFeed {
+            max-width: 100%;
+            max-height: 85vh;
+            border: 3px solid #059669;
+            box-shadow: 0 0 20px rgba(5, 150, 105, 0.3);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: rgba(5, 150, 105, 0.12);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        nav .navbar-left .logo-badge {
+            background: #059669;
+            color: white;
+            padding: 6px 12px;
+            font-weight: 900;
+            font-size: 1.2rem;
+            border: 2px solid #000;
+        }
+
+        nav .navbar-right a {
+            margin-left: 1.2rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+        }
+
+        .pixel-border {
+            border: 4px solid #000;
+        }
+
+        .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+        }
+    </style>
+</head>
+<body>
+    <nav class="pixel-border">
+        <div class="navbar-left">
+            <span class="logo-badge pixel-font">MOVE</span>
+            <span class="pixel-font" style="font-size: 0.9rem;">Left Arm Curl Studio</span>
+        </div>
+        <div class="navbar-right">
+            <a href="/practicestudio">exercises</a>
+            <a href="/">home</a>
+        </div>
+    </nav>
+
+    <div id="outerContainer">
+        <div id="videoContainer">
+            <img id="videoFeed" src="{{ url_for('practice_video_feed') }}" alt="Live Feed">
+        </div>
+    </div>
+</body>
+</html>
