@@ -141,6 +141,13 @@
                 <div style="font-size: 0.85rem; margin-top: 4px;">Active loose fabric compensation: <strong>88% Confidence</strong></div>
             </div>
 
+            <div style="display: flex; gap: 8px; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.06); padding: 8px; border: 2px solid #000;">
+                <span style="font-size: 0.75rem; font-weight: bold;">SPEED:</span>
+                <button onclick="setSpeed(0.5)" id="spd05" class="pixel-font" style="padding: 4px 8px; font-size: 0.7rem; border: 2px solid #000; background: #fff; cursor: pointer;">0.5x</button>
+                <button onclick="setSpeed(0.75)" id="spd075" class="pixel-font" style="padding: 4px 8px; font-size: 0.7rem; border: 2px solid #000; background: #fff; cursor: pointer;">0.75x</button>
+                <button onclick="setSpeed(1.0)" id="spd10" class="pixel-font" style="padding: 4px 8px; font-size: 0.7rem; border: 2px solid #000; background: #059669; color: white; cursor: pointer;">1.0x</button>
+            </div>
+
             <button onclick="toggleAudioGuide()" id="audioBtn" style="background-color: #059669; border: 3px solid #000; font-family: 'Space Mono', monospace; font-size: 0.9rem; padding: 10px; cursor: pointer; color: white; width: 100%;">
                 🔊 استمع للتوجيه الصوتي (سيلما AI)
             </button>
@@ -154,30 +161,81 @@
         var repsDisplay = document.getElementById('repsDisplay');
         var stageDisplay = document.getElementById('stageDisplay');
 
-        var repInterval = 3.8;
+        function setSpeed(rate) {
+            video.playbackRate = rate;
+            ['spd05', 'spd075', 'spd10'].forEach(function(id) {
+                var btn = document.getElementById(id);
+                btn.style.backgroundColor = '#fff';
+                btn.style.color = '#000';
+            });
+            var activeId = rate === 0.5 ? 'spd05' : (rate === 0.75 ? 'spd075' : 'spd10');
+            var activeBtn = document.getElementById(activeId);
+            if (activeBtn) {
+                activeBtn.style.backgroundColor = '#059669';
+                activeBtn.style.color = '#fff';
+            }
+        }
 
         video.addEventListener('timeupdate', function() {
-            var time = video.currentTime;
-            var cycle = (time % repInterval) / repInterval;
-            var ang = Math.round(100 + 65 * Math.cos(cycle * 2 * Math.PI));
-            angleDisplay.innerText = ang + "°";
+            var t = video.currentTime % 14.29;
+            var ang, stageText, stageColor, reps;
 
-            var reps = Math.floor(time / repInterval);
-            repsDisplay.innerText = reps;
-
-            if (cycle < 0.25) {
-                stageDisplay.innerText = "EXTENDED";
-                stageDisplay.style.color = "#4b5563";
-            } else if (cycle < 0.5) {
-                stageDisplay.innerText = "FLEXING UP";
-                stageDisplay.style.color = "#059669";
-            } else if (cycle < 0.75) {
-                stageDisplay.innerText = "PEAK FLEXION";
-                stageDisplay.style.color = "#d97706";
+            if (t < 4.2) {
+                var p = t / 4.2;
+                ang = Math.round(168 + 7 * Math.sin(p * Math.PI));
+                stageText = "READY / EXTENDED";
+                stageColor = "#4b5563";
+                reps = 0;
+            } else if (t < 6.4) {
+                var p = (t - 4.2) / 2.2;
+                var ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
+                ang = Math.round(172 - 148 * ease);
+                stageText = "CURLING UP";
+                stageColor = "#059669";
+                reps = 0;
+            } else if (t < 7.0) {
+                ang = 24;
+                stageText = "PEAK FLEXION (ROM 100%)";
+                stageColor = "#d97706";
+                reps = 0;
+            } else if (t < 8.6) {
+                var p = (t - 7.0) / 1.6;
+                var ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
+                ang = Math.round(24 + 144 * ease);
+                stageText = "CONTROLLED LOWERING";
+                stageColor = "#2563eb";
+                reps = 0;
+            } else if (t < 10.4) {
+                ang = Math.round(168 + 6 * Math.sin((t - 8.6) * Math.PI));
+                stageText = "REP 1 COMPLETE - REST";
+                stageColor = "#059669";
+                reps = 1;
+            } else if (t < 12.4) {
+                var p = (t - 10.4) / 2.0;
+                var ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
+                ang = Math.round(174 - 150 * ease);
+                stageText = "CURLING UP";
+                stageColor = "#059669";
+                reps = 1;
+            } else if (t < 12.8) {
+                ang = 24;
+                stageText = "PEAK FLEXION (ROM 100%)";
+                stageColor = "#d97706";
+                reps = 1;
             } else {
-                stageDisplay.innerText = "LOWERING";
-                stageDisplay.style.color = "#2563eb";
+                var p = Math.min((t - 12.8) / 1.4, 1.0);
+                var ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
+                ang = Math.round(24 + 141 * ease);
+                var isDone = p > 0.8;
+                stageText = isDone ? "REP 2 COMPLETE - READY" : "CONTROLLED LOWERING";
+                stageColor = isDone ? "#059669" : "#2563eb";
+                reps = isDone ? 2 : 1;
             }
+
+            angleDisplay.innerText = ang + "°";
+            repsDisplay.innerText = reps;
+            stageDisplay.innerText = stageText;
+            stageDisplay.style.color = stageColor;
         });
 
         function toggleAudioGuide() {
